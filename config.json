@@ -1,0 +1,17 @@
+{
+	"permission_count": 5,
+	"permission_names": [
+		"BLOCKED", //no commands
+		"BASIC", //.date, .time, etc.
+		"ADVANCED", //.ping, .uptime, etc.
+		"OPERATOR", //.exit, .permissionlevel, etc.
+		"SERVER OWNER" //.command, .name, etc.
+	],
+	"command_permissions": {
+		"ping": 2,
+		"exit": 3,
+		"command": 4,
+		"reload_config": 4,
+		"wildbot": 4
+	}
+}
