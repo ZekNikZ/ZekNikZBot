@@ -14,15 +14,15 @@ Date.prototype.timeNow = function () {
     return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
 }
 
-log_level = ['INFO', 'WARNING', 'ERROR']
-log_level_color = ['FFFFFF', 'FFFF00', 'FF0000']
-l_info = 0
-l_warn = 1
-l_error = 2
+global.log_level = ['INFO', 'WARNING', 'ERROR']
+global.log_level_color = ['FFFFFF', 'FFFF00', 'FF0000']
+global.l_info = 0
+global.l_warn = 1
+global.l_error = 2
 
 function log(message, level) {
-	if (level == null) level = l_info;
-	console.log(new Date().today() + ' ' + new Date().timeNow() + ' ' + log_level[level] + ': ' + message) //, 'color: #' + log_level_color[level])
+	if (level == null) level = global.l_info;
+	console.log(new Date().today() + ' ' + new Date().timeNow() + ' ' + global.log_level[level] + ': ' + message) //, 'color: #' + log_level_color[level])
 	return message;
 }
 
