@@ -80,7 +80,7 @@ client.on('ready', () => {
 client.on('message', msg => {
     for (var command in com) {
     	if (com.hasOwnProperty(command)) {
-        	if (msg.content.toLowerCase().startsWith(prefix + com[command].name)) {
+        	if (new RegExp('^\\' + prefix + com[command].name.toLowerCase() + '( |$)', 'gi').test(msg.content)) {
         		log("Received '" + prefix + com[command].name + "' command from user '" + msg.member.nickname + "'.");
         		if (checkPermissions(msg.guild, msg.member) >= com[command].level) {
         			args = msg.content.substring(com[command].name.length + 2).split(' ').clean('');
