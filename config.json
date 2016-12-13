@@ -1,17 +1,24 @@
 {
-	"permission_count": 5,
+	"prefix": ".",
 	"permission_names": [
-		"BLOCKED", //no commands
-		"BASIC", //.date, .time, etc.
-		"ADVANCED", //.ping, .uptime, etc.
-		"OPERATOR", //.exit, .permissionlevel, etc.
-		"SERVER OWNER" //.command, .name, etc.
+		"BLOCKED",
+		"BASIC",
+		"ADVANCED",
+		"OPERATOR",
+		"SERVER OWNER"
 	],
-	"command_permissions": {
-		"ping": 2,
-		"exit": 3,
-		"command": 4,
-		"reload_config": 4,
-		"wildbot": 4
+	"permission_overrides": {
+		"exit": 2
+	},
+	"command_aliases": {
+		".mm": "massmove"
+	},
+	"channel_aliases": {
+		"g": "Guild Hub",
+		"p": "Pub",
+		"t": "Training Room",
+		"a": "Armory",
+		"s": "Storage",
+		"b": "Bed Chambers (AFK)"
 	}
 }
