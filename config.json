@@ -19,6 +19,9 @@
 		"t": "Training Room",
 		"a": "Armory",
 		"s": "Storage",
+		"l": "Library",
+		"w": "Wine Cellar",
+		"gc": "Grand Council",
 		"b": "Bed Chambers (AFK)"
 	}
 }

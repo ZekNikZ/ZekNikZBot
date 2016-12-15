@@ -85,8 +85,8 @@ commands.massmove = {
 		command = args;
 		command[0] = channel_aliases[command[0].toLowerCase()]||command[0];
 		command[1] = channel_aliases[command[1].toLowerCase()]||command[1];
-		log('Moving users from \'' + command[1] + '\' to \'' + command[0] + '\'');
-		msg.reply('moving users from \'' + command[1] + '\' to \'' + command[0] + '\'');
+		log('Moving users from \'' + command[0] + '\' to \'' + command[1] + '\'');
+		msg.reply('moving users from \'' + command[0] + '\' to \'' + command[1] + '\'');
 		channel_to = msg.guild.channels.find('name', command[1]);
 		members = msg.guild.channels.find('name', command[0]).members;
 		members.array().forEach(function(member){member.setVoiceChannel(channel_to);})
