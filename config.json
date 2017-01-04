@@ -1,5 +1,6 @@
 {
 	"prefix": ".",
+	"gameprefix": "$",
 	"permission_names": [
 		"BLOCKED",
 		"BASIC",

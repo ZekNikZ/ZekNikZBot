@@ -1,4 +1,5 @@
 const jsonfile = require('jsonfile');
+var games = require('./games.js');
 
 var config = undefined;
 var prefix = undefined;
@@ -130,9 +131,85 @@ commands.level = {
 		for (member of msg.mentions.users.array()) {
 			permissions[msg.guild.id][member.id] = parseInt(args[0]);
 		}
-		jsonfile.writeFileSync('./permissions.json', permissions, {spaces: 2});
+		jsonfile.writeFileSync('./permissions.json', permissions, {spaces: 4});
 		resetPermissionsConfig = !resetPermissionsConfig;
 		msg.reply('permission level(s) set successfully.');
+	}
+}
+
+commands.massdelete = {
+	name: 'massdelete',
+	help: 'Mass deletes messages.',
+	usage: 'massdelete [number]',
+	level: 2,
+	func: function (msg, args) {
+		if (args.length != 1) {
+			msg.reply('invalid number of arguments.');
+		} else {
+			msg.channel.bulkDelete(parseInt(args[0]) + 1);
+		}
+	}
+}
+
+commands.creategame = {
+	name: 'creategame',
+	help: 'Creates a game.',
+	usage: 'creategame [game_type] [max_players]',
+	level: 1,
+	func: function (msg, args, client) {
+		if (args.length != 2) {
+			msg.reply('invalid number of arguments.');
+		} else {
+			id = games.createGame(msg, args[0], args[1], client);
+			if (id == null) {
+				msg.reply('could not create game.');
+			} else {
+				msg.reply('game created. Game ID: ' + id);
+			}
+		}
+	}
+}
+
+commands.joingame = {
+	name: 'joingame',
+	help: 'Joins a game.',
+	usage: 'joingame [game_id]',
+	level: 0,
+	func: function (msg, args) {
+		if (args.length != 1) {
+			msg.reply('invalid number of arguments.');
+		} else {
+			if (games.joinGame(msg, args[0])) {
+				msg.reply('joined game ' + args[0]);
+			} else {
+				msg.reply('could not join game ' + args[0]);
+			}
+		}
+	}
+}
+
+commands.endgame = {
+	name: 'endgame',
+	help: 'Ends a game and deletes the associated channels.',
+	usage: 'endgame (id)',
+	level: 1,
+	func: function (msg, args) {
+		if (args.length >= 2) msg.reply('invalid number of arguments.');
+		if (args.length == 1) {
+			games.endGame(msg, args[0]);
+		} else {
+			games.endCurrentGame(msg);
+		}
+	}
+}
+
+commands.startgame = {
+	name: 'startgame',
+	help: 'Starts a game.',
+	usage: 'startgame',
+	level: 1,
+	func: function (msg) {
+		games.startGame(msg);
 	}
 }
 

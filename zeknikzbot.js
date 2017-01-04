@@ -10,9 +10,11 @@ var resetPermissions = require('./commands.js').resetPermissions;
 var setResetPermissions = require('./commands.js').setResetPermissions;
 var config = undefined;
 var prefix = undefined;
+var gameprefix = undefined;
 jsonfile.readFile('./config.json', function (err, obj) {
 	config = obj;
 	prefix = config.prefix;
+	gameprefix = config.gameprefix;
 	log("Config loaded.");
 });
 var permissions = undefined;
@@ -20,6 +22,7 @@ jsonfile.readFile('./permissions.json', function (err, obj) {
 	permissions = obj;
 	log("Permissions loaded.");
 });
+var games = require('./games.js');
 
 const log_level = ['INFO', 'WARNING', 'ERROR'];
 const l_info = 0;
@@ -64,7 +67,7 @@ function checkPermissions(guild, member) {
 			return permissions[guild.id][member.id];
 		} else {
 			permissions[guild.id][member.id] = 0;
-			jsonfile.writeFileSync('./permissions.json', permissions, {spaces: 2});
+			jsonfile.writeFileSync('./permissions.json', permissions, {spaces: 4});
 			return 0;
 		}
 	} else {
@@ -78,6 +81,12 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
+	if (msg.content.startsWith(gameprefix) && msg.channel.type == 'dm') {
+		//command = new RegExp('^\\' + prefix + com[command].name.toLowerCase() + '( |$)', 'gi').match(msg.content);
+		command = msg.content.substring(1, msg.content.search(/( |$)/));
+	    args = msg.content.substring(command.length + 2).split(' ').clean('');
+    	games.command(msg, command, args, client);
+    }
     for (var command in com) {
     	if (com.hasOwnProperty(command)) {
         	if (new RegExp('^\\' + prefix + com[command].name.toLowerCase() + '( |$)', 'gi').test(msg.content)) {
