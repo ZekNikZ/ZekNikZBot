@@ -87,6 +87,7 @@ client.on('message', msg => {
 	    args = msg.content.substring(command.length + 2).split(' ').clean('');
     	games.command(msg, command, args, client);
     }
+    if (msg.channel.type == 'dm') return;
     for (var command in com) {
     	if (com.hasOwnProperty(command)) {
         	if (new RegExp('^\\' + prefix + com[command].name.toLowerCase() + '( |$)', 'gi').test(msg.content)) {

@@ -154,13 +154,13 @@ commands.massdelete = {
 commands.creategame = {
 	name: 'creategame',
 	help: 'Creates a game.',
-	usage: 'creategame [game_type] [max_players]',
-	level: 1,
+	usage: 'creategame [game_type] [max_players] (invite_only) (user1, user2...)',
+	level: 0,
 	func: function (msg, args, client) {
-		if (args.length != 2) {
+		if (args.length < 2) {
 			msg.reply('invalid number of arguments.');
 		} else {
-			id = games.createGame(msg, args[0], args[1], client);
+			id = games.createGame(msg, args[0], args[1], client, args[2] == 'true');
 			if (id == null) {
 				msg.reply('could not create game.');
 			} else {
@@ -192,7 +192,7 @@ commands.endgame = {
 	name: 'endgame',
 	help: 'Ends a game and deletes the associated channels.',
 	usage: 'endgame (id)',
-	level: 1,
+	level: 0,
 	func: function (msg, args) {
 		if (args.length >= 2) msg.reply('invalid number of arguments.');
 		if (args.length == 1) {
@@ -207,9 +207,31 @@ commands.startgame = {
 	name: 'startgame',
 	help: 'Starts a game.',
 	usage: 'startgame',
-	level: 1,
+	level: 0,
 	func: function (msg) {
 		games.startGame(msg);
+	}
+}
+
+commands.gameslist = {
+	name: 'games',
+	help: 'Lists avaliable games.',
+	usage: 'games',
+	level: 0,
+	func: function (msg) {
+		games.listGames(msg);
+	}
+}
+
+commands.invite = {
+	name: 'invite',
+	help: 'Invites a player to your current game.',
+	usage: 'invite [user1] (user2, user3...)',
+	level: 0,
+	func: function (msg) {
+		if (!games.invitePlayer(msg)) {
+			msg.reply('you do not have permission to use this command.');
+		}
 	}
 }
 

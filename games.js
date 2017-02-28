@@ -5,6 +5,15 @@ jsonfile.readFile('./games.json', function (err, obj) {
 	gamesfile = obj;
 	log("Games loaded.");
 });
+var config = undefined;
+var prefix = undefined;
+var gameprefix = undefined;
+jsonfile.readFile('./config.json', function (err, obj) {
+	config = obj;
+	prefix = config.prefix;
+	gameprefix = config.gameprefix;
+	log("Config loaded.");
+});
 
 const log_level = ['INFO', 'WARNING', 'ERROR'];
 const l_info = 0;
@@ -12,7 +21,15 @@ const l_warn = 1;
 const l_error = 2;
 
 var games = {
-	acquiretiles: require('./games/acquiretiles.js')
+	acquiretiles: require('./games/acquiretiles.js'),
+	csgo: require('./games/basegame.js'),
+	terraria: require('./games/basegame.js'),
+	rocketleague: require('./games/basegame.js'),
+	ktane: require('./games/basegame.js'),
+	h1z1: require('./games/basegame.js'),
+	overwatch: require('./games/basegame.js'),
+	homework: require('./games/basegame.js'),
+	supermegabaseballextrainnings: require('./games/basegame.js')
 }
 
 Date.prototype.today = function () { 
@@ -38,13 +55,19 @@ function genNewId() {
 	}
 }
 
-function createGame(msg, gametype, max_players, client) {
-	if (!(gametype in games)) return null;
+function createGame(msg, gametype, max_players, client, _invite_only) {
+	if (!(msg.member.id in gamesfile.users)) gamesfile.users[msg.member.id] = "0";
+	if (!(gametype in games) || gamesfile.users[msg.member.id] != "0") return null;
 	id = genNewId();
-	gamesfile.games[id] = {game: gametype, max_users: max_players, host: msg.member.id, players: []};
+	_invites = [];
+	for (member of msg.mentions.users.array()) {
+		_invites.push(member.id);
+		member.sendMessage('You were invited to join game ' + id + '. To join, type the command \'' + prefix + 'joingame ' + id + '\' in a server that I am in.');
+	}
+	gamesfile.games[id] = {game: gametype, max_users: max_players, host: msg.member.id, players: [], invite_only: _invite_only, invites: _invites};
 	msg.guild.createChannel('game_' + id, 'voice').then(function (channel) {
 		channel.overwritePermissions(msg.guild.id, {CONNECT: false});
-		channel.userLimit = max_players;
+		channel.setUserLimit(max_players);
 		channel.overwritePermissions(client.user, {CONNECT: true});
 	});
 	msg.guild.createChannel('game_' + id, 'text').then(function (channel) {
@@ -53,6 +76,7 @@ function createGame(msg, gametype, max_players, client) {
 		channel.overwritePermissions(client.user, {READ_MESSAGES: true});
 	});
 	games[gametype].setupGame(id, msg.member.id, msg.guild.id);
+	updateGamesFile();
 	return id;
 }
 
@@ -79,7 +103,10 @@ function addPlayerToGame(id, member) {
 
 function joinGame(msg, id) {
 	if (!(msg.member.id in gamesfile.users)) gamesfile.users[msg.member.id] = "0";
-	if (id in gamesfile.games && gamesfile.users[msg.member.id] == 0 && gamesfile.games[id].max_users > gamesfile.games[id].players.length) {
+	if (id in gamesfile.games && gamesfile.users[msg.member.id] == '0' && gamesfile.games[id].max_users > gamesfile.games[id].players.length) {
+		if (gamesfile.games[id].invite_only) {
+			if (gamesfile.games[id].invites.indexOf(msg.member.id) == -1) return false;
+		}
 		addPlayerToGame(id, msg.member);
 		return true;
 	} else {
@@ -115,13 +142,34 @@ function endCurrentGame(msg) {
 }
 
 function command(msg, command, args, client) {
-	if (gamesfile.users[msg.author.id] == 0) return;
+	if (gamesfile.users[msg.author.id] == '0') return;
 	games[gamesfile.games[gamesfile.users[msg.author.id]].game].onCommand(msg, command, args, gamesfile.users[msg.author.id], client);
 }
 
 function startGame(msg) {
-	if (gamesfile.users[msg.member.id] == 0) return;
+	if (gamesfile.users[msg.member.id] == '0') return;
 	games[gamesfile.games[gamesfile.users[msg.member.id]].game].startGame(gamesfile.users[msg.member.id], gamesfile.games[gamesfile.users[msg.member.id]].players);
+}
+
+function listGames(msg) {
+	result = '```';
+	for (var game in games) {
+		result += game;
+		result += '\n';
+	}
+	msg.reply(result + '```');
+}
+
+function invitePlayer(msg) {
+	id = gamesfile.users[msg.member.id];
+	if (!(id in gamesfile.games)) return false;
+	if (msg.member.id != gamesfile.games[id].host) return false;
+	for (member of msg.mentions.users.array()) {
+		gamesfile.games[id].invites.push(member.id);
+		member.sendMessage('You were invited to join game ' + id + '. To join, type the command \'' + prefix + 'joingame ' + id + '\' in a server that I am in.');
+	}
+	updateGamesFile();
+	return true;
 }
 
 exports.createGame = createGame;
@@ -131,3 +179,5 @@ exports.endCurrentGame = endCurrentGame;
 exports.command = command;
 exports.games = games;
 exports.startGame = startGame;
+exports.listGames = listGames;
+exports.invitePlayer = invitePlayer;
