@@ -1,0 +1,85 @@
+{
+    "next_id": 4,
+    "polls": {
+        "1": {
+            "question": "Test Question",
+            "state": "closed",
+            "options": [
+                "Option 1",
+                "Option 2",
+                "Option 3"
+            ],
+            "votes": [
+                3,
+                4,
+                0
+            ],
+            "voters": [
+                "133105799818903552"
+            ]
+        },
+        "2": {
+            "state": "closed",
+            "question": "Game Night (3/4 at 8:30pm)",
+            "options": [
+                "Town of Salem (Free)",
+                "Tabletop Simulator ($20)",
+                "Keep Talking and Nobody Explodes (Free)",
+                "SUPERFIGHT ($10 if participant)",
+                "Jackbox Party Pack (Free)"
+            ],
+            "votes": [
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "voters": []
+        },
+        "3": {
+            "state": "open",
+            "question": "Game Night (3/4 at 8:30pm)",
+            "options": [
+                "Town of Salem (Free)",
+                "Tabletop Simulator ($20)",
+                "Keep Talking and Nobody Explodes (Free)",
+                "SUPERFIGHT ($10 if participant)",
+                "Jackbox Party Pack (Free)"
+            ],
+            "votes": [
+                1,
+                2,
+                0,
+                0,
+                2
+            ],
+            "voters": [
+                "133105799818903552",
+                "217039776052805643",
+                "147839238421872640",
+                "158039499421515776",
+                "147845664473088000"
+            ]
+        },
+        "4": {
+            "state": "closed",
+            "question": "Test Poll 2",
+            "options": [
+                "Option 1",
+                "Option 2",
+                "Option 3"
+            ],
+            "votes": [
+                0,
+                0,
+                2
+            ],
+            "voters": [
+                "105717831781384192",
+                "147845664473088000",
+                "174303100281028608"
+            ]
+        }
+    }
+}

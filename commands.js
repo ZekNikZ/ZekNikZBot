@@ -10,6 +10,11 @@ jsonfile.readFile('./permissions.json', function (err, obj) {
 	permissions = obj;
 	log("Permissions loaded.");
 });
+var polls = undefined;
+jsonfile.readFile('./polls.json', function (err, obj) {
+	polls = obj;
+	log('Polls loaded.');
+});
 
 var resetPermissionsConfig = false;
 
@@ -233,6 +238,119 @@ commands.invite = {
 			msg.reply('you do not have permission to use this command.');
 		}
 	}
+}
+
+commands.startpoll = {
+	name: 'startpoll',
+	help: 'Starts a poll.',
+	usage: 'startpoll [question]|[option1];[option2];[option3...]',
+	level: 2,
+	func: function (msg, args, client) {
+		id = nextPollId();
+		a = msg.content.substring(11).split('|')
+		o = a[1].split(';');
+		v = [];
+		for (var z = 0; z < o.length; z++) {
+			v.push(0);
+		}
+		polls.polls[id] = {state: "open", question:a[0], options:o, votes:v, voters:[]};
+		jsonfile.writeFile('./polls.json', polls, {spaces: 4}, function(err){
+			console.error(err);
+		});
+	}
+}
+
+commands.vote = {
+	name: 'vote',
+	help: 'Votes for a poll.',
+	usage: 'vote [pollid] [option]',
+	level: 0,
+	func: function (msg, args) {
+		if (args.length != 2) {
+			msg.reply('invalid number of arguments.');
+			return;
+		}
+		id = args[0];
+		option = args[1];
+		if (polls.polls[id].state != "open") {
+			msg.reply('that poll has already closed!')
+			return;
+		}
+		if (polls.polls[id].voters.indexOf(msg.member.id.toString()) > -1) {
+			msg.reply('you\'ve already voted!');
+			return;
+		}
+		if (!(id in polls.polls)) {
+			msg.reply('invalid poll ID.');
+			return;
+		}
+		if (parseInt(option)-1 >= polls.polls[id].options.length || parseInt(option)-1 < 0 || isNaN(option)) {
+			msg.reply('invalid option.');
+			return;
+		}
+		polls.polls[id].votes[parseInt(option)-1] += 1;
+		polls.polls[id].voters.push(msg.member.id);
+		jsonfile.writeFile('./polls.json', polls, {spaces: 4}, function(err){
+			console.error(err);
+		});
+		msg.reply('vote recorded successfully!')
+	}
+}
+
+commands.results = {
+	name: 'results',
+	help: 'Returns the results of a poll.',
+	usage: 'results [pollid]',
+	level: 1,
+	func: function (msg, args) {
+		if (args.length != 1) {
+			msg.reply('invalid number of arguments.');
+			return;
+		}
+		id = args[0];
+		if (!(id in polls.polls)) {
+			msg.reply('invalid poll ID.');
+			return;
+		}
+		result = '```Poll ' + id + ': ' + polls.polls[id].question + '\n';
+		for (var i = 0; i < polls.polls[id].options.length; i++) {
+			result += polls.polls[id].options[i] + ': ' + polls.polls[id].votes[i] + '\n';
+		}
+		msg.reply(result + '```')
+	}
+}
+
+commands.pollstate = {
+	name: 'pollstate',
+	help: 'Sets the poll state of a poll.',
+	usage: 'pollstate [pollid] [open|closed]',
+	level: 2,
+	func: function (msg, args) {
+		if (args.length != 2) {
+			msg.reply('invalid number of arguments.');
+			return;
+		}
+		id = args[0];
+		state = args[1];
+		if (!(id in polls.polls)) {
+			msg.reply('invalid poll ID.');
+			return;
+		}
+		polls.polls[id].state = state;
+		jsonfile.writeFile('./polls.json', polls, {spaces: 4}, function(err){
+			console.error(err);
+		});
+		msg.reply('Poll ' + id + '\'s state set to "' + state + '"');
+	}
+}
+
+function nextPollId() {
+	id = polls['next_id']
+	polls['next_id'] = id + 1
+	jsonfile.writeFile('./polls.json', polls, {spaces: 4}, function(err){
+		console.error(err);
+	});
+	return id + 1
 }
 
 exports.commands = commands;
